@@ -2,8 +2,6 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense
 from sklearn.utils import shuffle
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from sklearn import preprocessing
@@ -18,21 +16,24 @@ import matplotlib as mpl
 mpl.use('tkagg')
 
 
-# February 24, 2019
-
-
-
 filename = 'filename.csv'
 names0 = ['sqft_lot','bedrooms','bathrooms','sqft_living']
 samples = np.array(pd.read_csv(filename, names=names0, skiprows=[0], header=None)).astype(float)
 where_are_NaNs = np.isnan(samples) # replaces NaNs with zeros
 samples[where_are_NaNs] = float(0)
 names1 = ['price']
-labels =  np.array(pd.read_csv(filename, names=names1, skiprows=[0], header=None)).astype(float) where_are_NaNs = np.isnan(labels) labels[where_are_NaNs] = float(0) y = labels
+labels =  np.array(pd.read_csv(filename, names=names1, skiprows=[0], header=None)).astype(float)
+where_are_NaNs = np.isnan(labels)
+labels[where_are_NaNs] = float(0)
+y = labels
 min_max_scaler = preprocessing.MinMaxScaler()
+
+
 X = min_max_scaler.fit_transform(samples.astype(np.float))
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2,random_state=1)
 X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, random_state=1)
+
+
 
 # fully/densely connected layers
 model = Sequential([
@@ -41,9 +42,11 @@ model = Sequential([
 model.summary()
 num_epochs = 400
 
+
 # training
 model.compile(optimizer=Adam(learning_rate=0.1), loss='mse', metrics=['mae','mse'])
 history = model.fit(X_train, y_train, epochs=num_epochs, batch_size=15,validation_data=(X_val, y_val), shuffle=True)
+
 
 # PLOTTING:
 loss_train = history.history['mae']
